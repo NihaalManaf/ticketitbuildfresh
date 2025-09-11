@@ -1,0 +1,16 @@
+fastapi
+requests
+python-telegram-bot
+stripe
+pymongo
+gunicorn
+uvicorn
+openai
+aiogram
+jinja2
+python-multipart
+phonenumbers
+python-dateutil
+qrcode
+aioboto3
+Pillow
