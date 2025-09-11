@@ -1,69 +1,98 @@
-TicketIT 
+# TicketIT
 
-//old comment
-Welcome to ticketIT! This repo consists of a new system of creating chatbots using an in house built abstraction system called NOJ.
+TicketIT is a chatbot system built on top of an in-house abstraction framework called **NOJ**, designed to make chatbot development more structured and state-driven. The system demonstrates how to manage chatbot states effectively while integrating with the **Telegram API** for the user interface.
 
-A chatbot, at any point of time, is in a state. This is an invariant. So, a chatbot that performs an operation such as a sale or form, basically
-goes through a series of states and so that is what I have built. All chatbots built ontop of NOJ will follow an array of states. Let us define what a state is
-slightly more clearly.
+---
 
-A state always
-    - expects an input
-    - runs handlingFn
-    - returns true or false
-    - sends an output (optional)
+## ✨ Features
 
-A state is represented by 2 things
-    - Conversation Flow
-    - Converstaion Stage
-    - Stored as [conversation Flow, conversation stage]
+- **State-Driven Design** – Every chatbot interaction is modeled as a deterministic sequence of states  
+- **Custom Abstractions (NOJ)** – Functional-programming-inspired framework for chatbot construction  
+- **Payment Support** – Integrated with Stripe for ticket sales  
+- **Extensible Architecture** – Validators, payload collectors, and profile retrieval modules for adaptability  
+- **Telegram Integration** – Works seamlessly with Telegram bots created via [@BotFather](https://t.me/BotFather)  
 
-I defined a series of states as a conversation - ex [genesis, collecttickettype, collectname, collectgender, collectdob, confirmation, collectticketqty, paymentpending]
-I will not go into the specifics of what these states are here but to begin the conversation, we use conversation starters or how i call them, conversation flows.
+---
 
-To begin the previous ex conversation, the user has to press /buy. This is the conversation flow. The conversation stage is simply the index of the array! 
-So if a customer is on the confirmation state, their state is -> [/buy, 5]
+## ⚡ Getting Started
 
-Alright! So states are the building blocks for all functions. I built NOJ with the concept of functional programming. So the function stateManager handles the state.
+### Requirements
 
-I will not go into exactly how stateManager works but it kind of acts as a router. it checks what kind of state the user is on and the function handleState finally executes the state.
-Look at these functions to gain more insight on how things work (there are comments everywhere to help you understand)
+- AWS account with **S3** and **Lambda** permissions  
+- Docker (for local MongoDB)  
+- ngrok (for webhook port forwarding)  
+- A `.pem` MongoDB connection file (`nm_db.pem`)  
 
-I have set up additional systems such as follows
-    - payloadCollector -> Every state asks for an input and all inputs are stored in the user infoPayload under a specific eventId.
-    - Validator -> All states have validation. So, we must validate all input if the state setsValidator. Validator is also set as an array [validatorType, [] dependancy array]
-    - profileRetrieval -> This is ticketIT specific. We basically pull all static (non changing) from our db. can be extended to other applications.
+### Environment Variables
 
-contact nihaalmanaf@gmail.com if you have any questions/suggestions.
-
-**//new comments**
-
-Hi Podpitch! I have cloned this repo into a new repo to save myself of over 400 embarrassing git commits. However, I cannot save myself from the review of this poor quality code. This could be a good opportunity 
-for me to show you what I would've done differently. However, I believe this project does have an interesting design for how we manage the states of a chatbot with telegram api for our user interface.
-
-You can run this locally, but there are many things to set up :(
-
-In your .env file, you would need to set up the following api keys 
+Create a `.env` file and add the following keys:
 
 ACCESS_KEY_LAMBDA=
 OPENAI_API_KEY=
-qrscanner= #this is a sort-of password we use for our scanner
+qrscanner= # password for scanner
 REGION_LAMBDA=
 SECRET_KEY_LAMBDA=
 stripe_key=
-webhook_key= #for stripe api 
-MISTRAL_API_KEY = 
-
-You will need to set up s3 and lamda permissions in your aws account that you provide in the access key. (ACCESS_KEY_LAMBDA)
-You will also need a .pem file for a valid mongodb connection. Name it nm_db.pem file and place it in the root folder.
-Do run a dockerised mongodb instance if you're running it locally (it's faster)
-
-If you are running locally, you'll need to run ngrok to portforward your localhost to the public (To allow webhooks to access our system)
-You will then need to set up a couple of webhooks
-- Stripe webhook needs to point to the server
-- Telegram webhook points to the server (create a telegram bot first via @Botfather)
-
-That's about it. We can go through the high level design during the interview. Looking forward to it.
+webhook_key= # for Stripe API
+MISTRAL_API_KEY=
 
 
+### Running Locally
 
+1. Spin up MongoDB (recommended via Docker for speed).  
+2. Place `nm_db.pem` in the repo root for secure MongoDB access.  
+3. Start **ngrok** to expose your localhost.  
+4. Register webhooks:
+   - **Stripe webhook** → points to your server  
+   - **Telegram webhook** → points to your server (set up via @BotFather)  
+
+---
+
+## 🛠️ High-Level Design
+
+TicketIT uses **NOJ**, a state-based abstraction for chatbot design.  
+
+- **State Invariant** – At any point, a chatbot is always in a defined state  
+- **Each State**:
+  - Expects an input  
+  - Runs a handler function (`handlingFn`)  
+  - Returns true/false  
+  - Optionally sends an output  
+
+A state is represented as:
+
+[conversation flow, conversation stage]
+
+
+### Example
+
+Conversation: `/buy`
+
+[genesis, collecttickettype, collectname, collectgender, collectdob, confirmation, collectticketqty, paymentpending]
+
+
+
+If a user is at **confirmation**:
+
+["/buy", 5]
+
+
+The **stateManager** acts as a router: it determines what state the user is in, then forwards execution to `handleState`.  
+
+---
+
+## 📦 Supporting Modules
+
+- **payloadCollector** – Captures and stores user inputs into an `infoPayload` (grouped by eventId)  
+- **Validator** – Ensures state inputs are valid, defined as:  
+
+[validatorType, [dependencies]]
+
+
+- **profileRetrieval** – TicketIT-specific module for fetching static user metadata from the DB (extendable to other use cases)  
+
+---
+
+## 📧 Contact
+
+For questions or suggestions: [nihaalmanaf@gmail.com](mailto:nihaalmanaf@gmail.com)
